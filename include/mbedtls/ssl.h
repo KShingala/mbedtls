@@ -40,6 +40,10 @@
 #include "x509_crl.h"
 #endif
 
+#if defined(MBEDTLS_RAW_PUBLIC_KEY_SUPPORT)
+#include "pk.h"
+#endif
+
 #if defined(MBEDTLS_DHM_C)
 #include "dhm.h"
 #endif
@@ -794,6 +798,38 @@ typedef int mbedtls_ssl_async_resume_t( mbedtls_ssl_context *ssl,
 typedef void mbedtls_ssl_async_cancel_t( mbedtls_ssl_context *ssl );
 #endif /* MBEDTLS_SSL_ASYNC_PRIVATE */
 
+#if defined(MBEDTLS_RAW_PUBLIC_KEY_SUPPORT)
+/**
+ * \brief           Callback type: verify peer's raw public key.
+ *
+ *                  This callback is called to verify the peer's raw public key during a handshake.
+ *                  The return value determines if the handshake should proceed or should be aborted.
+ *
+ *
+ * \param ssl             The SSL connection instance. It should not be
+ *                        modified.
+ * \param ssl             The peer's raw public key. It should not be
+ *                        modified.
+ * \return          Return 0 if verification succeeded, else, MBEDTLS_ERR_SSL_PEER_VERIFY_FAILED.
+ */
+typedef int mbedtls_ssl_peer_raw_publickey_verify( mbedtls_ssl_context *ssl,
+	                                               mbedtls_pk_context *peer_key);
+
+/**
+ * \brief           Callback type: provide own raw public key pair.
+ *
+ *                  This callback is called to provide the (own)raw public key to be used a handshake.
+ *
+ *
+ * \param ssl             The SSL connection instance. It should not be
+ *                        modified.
+ * \param ssl             The own public key context. It should not be
+ *                        modified.
+ */
+typedef void mbedtls_ssl_peer_raw_publickey_verify(mbedtls_ssl_context *ssl,
+	                                               mbedtls_pk_context *own_context);
+#endif /* MBEDTLS_RAW_PUBLIC_KEY_SUPPORT */
+
 /*
  * This structure is used for storing current session data.
  */
@@ -871,6 +907,11 @@ struct mbedtls_ssl_config
     void *p_vrfy;                   /*!< context for X.509 verify calllback */
 #endif
 
+#if defined(MBEDTLS_RAW_PUBLIC_KEY_SUPPORT)
+    int (*f_raw_pk)(void *, mbedtls_ssl_context *, const mbedtls_pk_context *);
+    mbedtls_ssl_peer_raw_publickey_verify f_peer_vrfy;
+#endif /* MBEDTLS_RAW_PUBLIC_KEY_SUPPORT */
+
 #if defined(MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED)
     /** Callback to retrieve PSK key from identity                          */
     int (*f_psk)(void *, mbedtls_ssl_context *, const unsigned char *, size_t);
@@ -923,6 +964,10 @@ struct mbedtls_ssl_config
 #if defined(MBEDTLS_KEY_EXCHANGE__WITH_CERT__ENABLED)
     const int *sig_hashes;          /*!< allowed signature hashes           */
 #endif
+
+#if defined(MBEDTLS_RAW_PUBLIC_KEY_SUPPORT)
+    mbedtls_pk_context * raw_keypair; /*!< own raw key pair. */
+#endif /* MBEDTLS_RAW_PUBLIC_KEY_SUPPORT */
 
 #if defined(MBEDTLS_ECP_C)
     const mbedtls_ecp_group_id *curve_list; /*!< allowed curves             */
@@ -2073,6 +2118,53 @@ int mbedtls_ssl_conf_own_cert( mbedtls_ssl_config *conf,
                               mbedtls_x509_crt *own_cert,
                               mbedtls_pk_context *pk_key );
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
+
+
+#if defined(MBEDTLS_RAW_PUBLIC_KEY_SUPPORT)
+/**
+ * \brief          Set the key pair to for raw public key exchange during handshake.
+ *
+ * \note           This is used for server's and clients.
+ * \note           Currently clients and servers can register .
+ *
+ * \param conf     SSL configuration
+ * \param psk      pointer to the pre-shared key
+ * \param psk_len  pre-shared key length
+ * \param psk_identity      pointer to the pre-shared key identity
+ * \param psk_identity_len  identity key length
+ *
+ * \return         0 if successful or MBEDTLS_ERR_SSL_ALLOC_FAILED
+ */
+int mbedtls_ssl_conf_own_raw_keypair( mbedtls_ssl_config *conf,
+                mbedtls_pk_context * raw_keypair);
+
+
+/**
+ * \brief          Set the callback to set the public key pair to for raw public key exchange during handshake.
+ *
+ *                 If set, the PSK callback is called for each
+ *                 handshake where a PSK ciphersuite was negotiated.
+ *                 The caller provides the identity received and wants to
+ *                 receive the actual PSK data and length.
+ *
+ *                 The callback has the following parameters: (void *parameter,
+ *                 mbedtls_ssl_context *ssl, const unsigned char *psk_identity,
+ *                 size_t identity_len)
+ *                 If a valid PSK identity is found, the callback should use
+ *                 \c mbedtls_ssl_set_hs_psk() on the ssl context to set the
+ *                 correct PSK and return 0.
+ *                 Any other return value will result in a denied PSK identity.
+ *
+ * \note           If you set a PSK callback using this function, then you
+ *                 don't need to set a PSK key and identity using
+ *                 \c mbedtls_ssl_conf_psk().
+ *
+ * \param conf     SSL configuration
+ * \param f_raw_pk pointer to public key context to define the key pair used for raw public key.
+ */
+void mbedtls_ssl_conf_own_raw_keypair_cb( mbedtls_ssl_config *conf,
+				int (*f_raw_pk)(void *, mbedtls_ssl_context *, const mbedtls_pk_context *) );
+#endif /* MBEDTLS_RAW_PUBLIC_KEY_SUPPORT */
 
 #if defined(MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED)
 /**
