@@ -229,6 +229,8 @@
  */
 #define MBEDTLS_TLS_EXT_SUPPORTED_POINT_FORMATS_PRESENT (1 << 0)
 #define MBEDTLS_TLS_EXT_ECJPAKE_KKPP_OK                 (1 << 1)
+#define MBEDTLS_TLS_EXT_CLIENT_CERTIFICATE_TYPE_PRESENT (1 << 2)
+#define MBEDTLS_TLS_EXT_SERVER_CERTIFICATE_TYPE_PRESENT (1 << 3)
 
 #ifdef __cplusplus
 extern "C" {
@@ -411,6 +413,10 @@ struct mbedtls_ssl_handshake_params
      * The library does not use it internally. */
     void *user_async_ctx;
 #endif /* MBEDTLS_SSL_ASYNC_PRIVATE */
+#if defined(MBEDTLS_RAW_PUBLIC_KEY_SUPPORT)
+    int client_cert_type;    /* cert types supported */
+    int server_cert_type;    /* cert types supported */
+#endif
 };
 
 typedef struct mbedtls_ssl_hs_buffer mbedtls_ssl_hs_buffer;
