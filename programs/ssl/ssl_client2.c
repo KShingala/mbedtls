@@ -335,6 +335,7 @@ void mbedtls_param_failed( const char *failure_condition,
 struct options
 {
     const char *server_name;    /* hostname of the server (client only)     */
+    const char *server_cn;      /* common name of the server (client only)     */
     const char *server_addr;    /* address of the server (client only)      */
     const char *server_port;    /* port on which the ssl service runs       */
     int debug_level;            /* level of debugging                       */
@@ -611,6 +612,7 @@ int main( int argc, char *argv[] )
     }
 
     opt.server_name         = DFL_SERVER_NAME;
+    opt.server_cn           = DFL_SERVER_NAME;
     opt.server_addr         = DFL_SERVER_ADDR;
     opt.server_port         = DFL_SERVER_PORT;
     opt.debug_level         = DFL_DEBUG_LEVEL;
@@ -664,7 +666,9 @@ int main( int argc, char *argv[] )
             goto usage;
         *q++ = '\0';
 
-        if( strcmp( p, "server_name" ) == 0 )
+        if( strcmp( p, "server_cn" ) == 0 )
+            opt.server_cn = q;
+        else if( strcmp( p, "server_name" ) == 0 )
             opt.server_name = q;
         else if( strcmp( p, "server_addr" ) == 0 )
             opt.server_addr = q;
@@ -1221,7 +1225,10 @@ int main( int argc, char *argv[] )
         if( strcmp( opt.ca_file, "none" ) == 0 )
             ret = 0;
         else
+        {
+            mbedtls_printf(" CA file = %s", opt.ca_file);
             ret = mbedtls_x509_crt_parse_file( &cacert, opt.ca_file );
+        }
     else
 #endif
 #if defined(MBEDTLS_CERTS_C)
@@ -1512,7 +1519,7 @@ int main( int argc, char *argv[] )
     }
 
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
-    if( ( ret = mbedtls_ssl_set_hostname( &ssl, opt.server_name ) ) != 0 )
+    if( ( ret = mbedtls_ssl_set_hostname( &ssl, opt.server_cn ) ) != 0 )
     {
         mbedtls_printf( " failed\n  ! mbedtls_ssl_set_hostname returned %d\n\n",
                         ret );
