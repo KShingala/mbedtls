@@ -429,12 +429,6 @@ int main( void )
     (out_be)[(i) + 7] = (unsigned char)( ( (in_le) >> 0  ) & 0xFF );    \
 }
 
-#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
-const int cert_types[] = { MBEDTLS_TLS_CERT_TYPE_RAW_PUBLIC_KEY,
-                           MBEDTLS_TLS_CERT_TYPE_X509,
-                           MBEDTLS_TLS_CERT_TYPE_NONE};
-#endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */
-
 #if defined(MBEDTLS_CHECK_PARAMS)
 #include "mbedtls/platform_util.h"
 void mbedtls_param_failed( const char *failure_condition,
@@ -509,6 +503,10 @@ struct options
     int dgram_packing;          /* allow/forbid datagram packing            */
     int badmac_limit;           /* Limit of records with bad MAC            */
 } opt;
+
+const int cert_types[] = { MBEDTLS_TLS_CERT_TYPE_RAW_PUBLIC_KEY,
+                           MBEDTLS_TLS_CERT_TYPE_X509,
+                           MBEDTLS_TLS_CERT_TYPE_NONE};
 
 static void my_debug( void *ctx, int level,
                       const char *file, int line,
@@ -2469,11 +2467,6 @@ int main( int argc, char *argv[] )
 #endif /* MBEDTLS_SSL_ASYNC_PRIVATE */
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
 
-#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
-    mbedtls_ssl_conf_client_certificate_types(&conf, cert_types);
-    mbedtls_ssl_conf_server_certificate_types(&conf, cert_types);
-#endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */
-
 #if defined(SNI_OPTION)
     if( opt.sni != NULL )
     {
@@ -2507,6 +2500,13 @@ int main( int argc, char *argv[] )
         mbedtls_ssl_conf_curves( &conf, curve_list );
     }
 #endif
+
+
+#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+    mbedtls_ssl_conf_client_certificate_types(&conf, cert_types);
+    mbedtls_ssl_conf_server_certificate_types(&conf, cert_types);
+#endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */
+
 
 #if defined(MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED)
     if( strlen( opt.psk ) != 0 && strlen( opt.psk_identity ) != 0 )
