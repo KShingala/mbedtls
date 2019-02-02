@@ -2501,8 +2501,8 @@ int main( int argc, char *argv[] )
     }
 #endif
 
-
-#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+#if 0
+//#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
     mbedtls_ssl_conf_client_certificate_types(&conf, cert_types);
     mbedtls_ssl_conf_server_certificate_types(&conf, cert_types);
 #endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */

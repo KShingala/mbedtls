@@ -317,6 +317,13 @@ int main( void )
 #define ALPN_LIST_SIZE  10
 #define CURVE_LIST_SIZE 20
 
+#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+const int cert_types[] = { MBEDTLS_TLS_CERT_TYPE_RAW_PUBLIC_KEY,
+                           MBEDTLS_TLS_CERT_TYPE_X509,
+                           MBEDTLS_TLS_CERT_TYPE_NONE};
+#endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */
+
+
 #if defined(MBEDTLS_CHECK_PARAMS)
 #include "mbedtls/platform_util.h"
 void mbedtls_param_failed( const char *failure_condition,
@@ -447,6 +454,12 @@ static int my_verify( void *data, mbedtls_x509_crt *crt,
 {
     char buf[1024];
     ((void) data);
+
+    if (depth == -1)
+    {
+        mbedtls_printf( "  Raw public key!\n" );
+        return 0;
+    }
 
     mbedtls_printf( "\nVerify requested for (Depth %d):\n", depth );
     mbedtls_x509_crt_info( buf, sizeof( buf ) - 1, "", crt );
@@ -1478,6 +1491,11 @@ int main( int argc, char *argv[] )
         }
     }
 #endif
+//#if 0
+#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+    mbedtls_ssl_conf_client_certificate_types(&conf, cert_types);
+    mbedtls_ssl_conf_server_certificate_types(&conf, cert_types);
+#endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */
 
 #if defined(MBEDTLS_ECP_C)
     if( opt.curves != NULL &&

@@ -5770,6 +5770,17 @@ crt_verify:
     {
 #if defined(MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT)
         if( ( ssl->conf->endpoint == MBEDTLS_SSL_IS_SERVER &&
+              ssl->handshake->client_cert_type == MBEDTLS_TLS_CERT_TYPE_RAW_PUBLIC_KEY ) ||
+            ( ssl->conf->endpoint == MBEDTLS_SSL_IS_CLIENT &&
+              ssl->handshake->server_cert_type == MBEDTLS_TLS_CERT_TYPE_RAW_PUBLIC_KEY ) )
+        {
+            uint32_t cur_flags = 0;
+
+            if( ( ret = ssl->conf->f_vrfy( ssl->conf->p_vrfy, ssl->session_negotiate->peer_cert, -1, &cur_flags ) ) != 0 )
+                return( ret );
+
+        }
+        if( ( ssl->conf->endpoint == MBEDTLS_SSL_IS_SERVER &&
               ssl->handshake->client_cert_type == MBEDTLS_TLS_CERT_TYPE_X509 ) ||
             ( ssl->conf->endpoint == MBEDTLS_SSL_IS_CLIENT &&
               ssl->handshake->server_cert_type == MBEDTLS_TLS_CERT_TYPE_X509 ) )
