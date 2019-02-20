@@ -139,7 +139,7 @@
  *
  * System has time.h, time(), and an implementation for
  * mbedtls_platform_gmtime_r() (see below).
- * The time needs to be correct (not necesarily very accurate, but at least
+ * The time needs to be correct (not necessarily very accurate, but at least
  * the date should be correct). This is used to verify the validity period of
  * X.509 certificates.
  *
@@ -226,6 +226,7 @@
 //#define MBEDTLS_PLATFORM_FPRINTF_ALT
 //#define MBEDTLS_PLATFORM_PRINTF_ALT
 //#define MBEDTLS_PLATFORM_SNPRINTF_ALT
+//#define MBEDTLS_PLATFORM_VSNPRINTF_ALT
 //#define MBEDTLS_PLATFORM_NV_SEED_ALT
 //#define MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
 
@@ -401,7 +402,7 @@
  * \note Because of a signature change, the core AES encryption and decryption routines are
  *       currently named mbedtls_aes_internal_encrypt and mbedtls_aes_internal_decrypt,
  *       respectively. When setting up alternative implementations, these functions should
- *       be overriden, but the wrapper functions mbedtls_aes_decrypt and mbedtls_aes_encrypt
+ *       be overridden, but the wrapper functions mbedtls_aes_decrypt and mbedtls_aes_encrypt
  *       must stay untouched.
  *
  * \note If you use the AES_xxx_ALT macros, then is is recommended to also set
@@ -576,35 +577,35 @@
  *
  * Enable Cipher Block Chaining mode (CBC) for symmetric ciphers.
  */
-#define MBEDTLS_CIPHER_MODE_CBC
+//#define MBEDTLS_CIPHER_MODE_CBC
 
 /**
  * \def MBEDTLS_CIPHER_MODE_CFB
  *
  * Enable Cipher Feedback mode (CFB) for symmetric ciphers.
  */
-#define MBEDTLS_CIPHER_MODE_CFB
+//#define MBEDTLS_CIPHER_MODE_CFB
 
 /**
  * \def MBEDTLS_CIPHER_MODE_CTR
  *
  * Enable Counter Block Cipher mode (CTR) for symmetric ciphers.
  */
-#define MBEDTLS_CIPHER_MODE_CTR
+//#define MBEDTLS_CIPHER_MODE_CTR
 
 /**
  * \def MBEDTLS_CIPHER_MODE_OFB
  *
  * Enable Output Feedback mode (OFB) for symmetric ciphers.
  */
-#define MBEDTLS_CIPHER_MODE_OFB
+//#define MBEDTLS_CIPHER_MODE_OFB
 
 /**
  * \def MBEDTLS_CIPHER_MODE_XTS
  *
  * Enable Xor-encrypt-xor with ciphertext stealing mode (XTS) for AES.
  */
-#define MBEDTLS_CIPHER_MODE_XTS
+//#define MBEDTLS_CIPHER_MODE_XTS
 
 /**
  * \def MBEDTLS_CIPHER_NULL_CIPHER
@@ -777,7 +778,7 @@
  *      MBEDTLS_TLS_PSK_WITH_3DES_EDE_CBC_SHA
  *      MBEDTLS_TLS_PSK_WITH_RC4_128_SHA
  */
-#define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED
@@ -808,7 +809,7 @@
  *             See dhm.h for more details.
  *
  */
-#define MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED
@@ -828,7 +829,7 @@
  *      MBEDTLS_TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA
  *      MBEDTLS_TLS_ECDHE_PSK_WITH_RC4_128_SHA
  */
-#define MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
@@ -853,7 +854,7 @@
  *      MBEDTLS_TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA
  *      MBEDTLS_TLS_RSA_PSK_WITH_RC4_128_SHA
  */
-#define MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
@@ -881,7 +882,7 @@
  *      MBEDTLS_TLS_RSA_WITH_RC4_128_SHA
  *      MBEDTLS_TLS_RSA_WITH_RC4_128_MD5
  */
-#define MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
@@ -914,7 +915,7 @@
  *             See dhm.h for more details.
  *
  */
-#define MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
@@ -939,7 +940,7 @@
  *      MBEDTLS_TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
  *      MBEDTLS_TLS_ECDHE_RSA_WITH_RC4_128_SHA
  */
-#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
@@ -1011,7 +1012,7 @@
  *      MBEDTLS_TLS_ECDH_RSA_WITH_CAMELLIA_128_GCM_SHA256
  *      MBEDTLS_TLS_ECDH_RSA_WITH_CAMELLIA_256_GCM_SHA384
  */
-#define MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
@@ -1349,7 +1350,7 @@
  *
  * Comment this macro to disable 1/n-1 record splitting.
  */
-#define MBEDTLS_SSL_CBC_RECORD_SPLITTING
+//#define MBEDTLS_SSL_CBC_RECORD_SPLITTING
 
 /**
  * \def MBEDTLS_SSL_RENEGOTIATION
@@ -1424,7 +1425,7 @@
  *
  * Comment this macro to disable support for TLS 1.0
  */
-#define MBEDTLS_SSL_PROTO_TLS1
+//#define MBEDTLS_SSL_PROTO_TLS1
 
 /**
  * \def MBEDTLS_SSL_PROTO_TLS1_1
@@ -1436,7 +1437,7 @@
  *
  * Comment this macro to disable support for TLS 1.1 / DTLS 1.0
  */
-#define MBEDTLS_SSL_PROTO_TLS1_1
+//#define MBEDTLS_SSL_PROTO_TLS1_1
 
 /**
  * \def MBEDTLS_SSL_PROTO_TLS1_2
@@ -1538,7 +1539,7 @@
  * \def MBEDTLS_SSL_SESSION_TICKETS
  *
  * Enable support for RFC 5077 session tickets in SSL.
- * Client-side, provides full support for session tickets (maintainance of a
+ * Client-side, provides full support for session tickets (maintenance of a
  * session store remains the responsibility of the application, though).
  * Server-side, you also need to provide callbacks for writing and parsing
  * tickets, including authenticated encryption and key management. Example
@@ -1687,6 +1688,15 @@
 #define MBEDTLS_X509_CHECK_EXTENDED_KEY_USAGE
 
 /**
+ * \def MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+ *
+ * Enable parsing and verification of raw public keys,
+ * according to RFC7250
+ */
+#define MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+
+
+/**
  * \def MBEDTLS_X509_RSASSA_PSS_SUPPORT
  *
  * Enable parsing and verification of X.509 certificates, CRLs and CSRS
@@ -1694,15 +1704,7 @@
  *
  * Comment this macro to disallow using RSASSA-PSS in certificates.
  */
-#define MBEDTLS_X509_RSASSA_PSS_SUPPORT
-
-/**
- * \def MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
- *
- * Enable parsing and verification of raw public keys,
- * according to RFC7250
- */
-#define MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+//#define MBEDTLS_X509_RSASSA_PSS_SUPPORT
 
 /**
  * \def MBEDTLS_ZLIB_SUPPORT
@@ -1712,7 +1714,7 @@
  *
  * \warning TLS-level compression MAY REDUCE SECURITY! See for example the
  * CRIME attack. Before enabling this option, you should examine with care if
- * CRIME or similar exploits may be a applicable to your use case.
+ * CRIME or similar exploits may be applicable to your use case.
  *
  * \note Currently compression can't be used with DTLS.
  *
@@ -1973,7 +1975,7 @@
  *      MBEDTLS_TLS_PSK_WITH_CAMELLIA_128_GCM_SHA256
  *      MBEDTLS_TLS_PSK_WITH_CAMELLIA_128_CBC_SHA256
  */
-#define MBEDTLS_CAMELLIA_C
+//#define MBEDTLS_CAMELLIA_C
 
 /**
  * \def MBEDTLS_ARIA_C
@@ -2060,7 +2062,7 @@
  *
  * Module:  library/chacha20.c
  */
-#define MBEDTLS_CHACHA20_C
+//#define MBEDTLS_CHACHA20_C
 
 /**
  * \def MBEDTLS_CHACHAPOLY_C
@@ -2071,7 +2073,7 @@
  *
  * This module requires: MBEDTLS_CHACHA20_C, MBEDTLS_POLY1305_C
  */
-#define MBEDTLS_CHACHAPOLY_C
+//#define MBEDTLS_CHACHAPOLY_C
 
 /**
  * \def MBEDTLS_CIPHER_C
@@ -2155,7 +2157,7 @@
  * \warning   DES is considered a weak cipher and its use constitutes a
  *            security risk. We recommend considering stronger ciphers instead.
  */
-#define MBEDTLS_DES_C
+//#define MBEDTLS_DES_C
 
 /**
  * \def MBEDTLS_DHM_C
@@ -2413,7 +2415,7 @@
  *            it, and considering stronger message digests instead.
  *
  */
-#define MBEDTLS_MD5_C
+//#define MBEDTLS_MD5_C
 
 /**
  * \def MBEDTLS_MEMORY_BUFFER_ALLOC_C
@@ -2638,7 +2640,7 @@
  * Module:  library/poly1305.c
  * Caller:  library/chachapoly.c
  */
-#define MBEDTLS_POLY1305_C
+//#define MBEDTLS_POLY1305_C
 
 /**
  * \def MBEDTLS_RIPEMD160_C
@@ -2649,7 +2651,7 @@
  * Caller:  library/md.c
  *
  */
-#define MBEDTLS_RIPEMD160_C
+//#define MBEDTLS_RIPEMD160_C
 
 /**
  * \def MBEDTLS_RSA_C
@@ -2668,7 +2670,7 @@
  *
  * Requires: MBEDTLS_BIGNUM_C, MBEDTLS_OID_C
  */
-#define MBEDTLS_RSA_C
+//#define MBEDTLS_RSA_C
 
 /**
  * \def MBEDTLS_SHA1_C
@@ -2690,7 +2692,7 @@
  *            on it, and considering stronger message digests instead.
  *
  */
-#define MBEDTLS_SHA1_C
+//#define MBEDTLS_SHA1_C
 
 /**
  * \def MBEDTLS_SHA256_C
@@ -2722,7 +2724,7 @@
  *
  * This module adds support for SHA-384 and SHA-512.
  */
-#define MBEDTLS_SHA512_C
+//#define MBEDTLS_SHA512_C
 
 /**
  * \def MBEDTLS_SSL_CACHE_C
@@ -3024,7 +3026,7 @@
 //#define MBEDTLS_PLATFORM_STD_TIME            time /**< Default time to use, can be undefined. MBEDTLS_HAVE_TIME must be enabled */
 //#define MBEDTLS_PLATFORM_STD_FPRINTF      fprintf /**< Default fprintf to use, can be undefined */
 //#define MBEDTLS_PLATFORM_STD_PRINTF        printf /**< Default printf to use, can be undefined */
-/* Note: your snprintf must correclty zero-terminate the buffer! */
+/* Note: your snprintf must correctly zero-terminate the buffer! */
 //#define MBEDTLS_PLATFORM_STD_SNPRINTF    snprintf /**< Default snprintf to use, can be undefined */
 //#define MBEDTLS_PLATFORM_STD_EXIT_SUCCESS       0 /**< Default exit value to use, can be undefined */
 //#define MBEDTLS_PLATFORM_STD_EXIT_FAILURE       1 /**< Default exit value to use, can be undefined */
@@ -3041,8 +3043,9 @@
 //#define MBEDTLS_PLATFORM_TIME_TYPE_MACRO       time_t /**< Default time macro to use, can be undefined. MBEDTLS_HAVE_TIME must be enabled */
 //#define MBEDTLS_PLATFORM_FPRINTF_MACRO      fprintf /**< Default fprintf macro to use, can be undefined */
 //#define MBEDTLS_PLATFORM_PRINTF_MACRO        printf /**< Default printf macro to use, can be undefined */
-/* Note: your snprintf must correclty zero-terminate the buffer! */
+/* Note: your snprintf must correctly zero-terminate the buffer! */
 //#define MBEDTLS_PLATFORM_SNPRINTF_MACRO    snprintf /**< Default snprintf macro to use, can be undefined */
+//#define MBEDTLS_PLATFORM_VSNPRINTF_MACRO    vsnprintf /**< Default vsnprintf macro to use, can be undefined */
 //#define MBEDTLS_PLATFORM_NV_SEED_READ_MACRO   mbedtls_platform_std_nv_seed_read /**< Default nv_seed_read function to use, can be undefined */
 //#define MBEDTLS_PLATFORM_NV_SEED_WRITE_MACRO  mbedtls_platform_std_nv_seed_write /**< Default nv_seed_write function to use, can be undefined */
 

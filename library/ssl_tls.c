@@ -9132,6 +9132,7 @@ static mbedtls_ecp_group_id ssl_preset_suiteb_curves[] = {
 
 #if defined(MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT)
 static int ssl_preset_certificate_types[] = {
+    MBEDTLS_TLS_CERT_TYPE_RAW_PUBLIC_KEY,
     MBEDTLS_TLS_CERT_TYPE_X509,
     MBEDTLS_TLS_CERT_TYPE_NONE
 };

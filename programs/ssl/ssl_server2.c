@@ -429,6 +429,8 @@ int main( void )
     (out_be)[(i) + 7] = (unsigned char)( ( (in_le) >> 0  ) & 0xFF );    \
 }
 
+int cert_types[] = {MBEDTLS_TLS_CERT_TYPE_RAW_PUBLIC_KEY, MBEDTLS_TLS_CERT_TYPE_X509, MBEDTLS_TLS_CERT_TYPE_NONE};
+
 #if defined(MBEDTLS_CHECK_PARAMS)
 #include "mbedtls/platform_util.h"
 void mbedtls_param_failed( const char *failure_condition,
@@ -1887,6 +1889,12 @@ int main( int argc, char *argv[] )
         }
     }
 #endif /* MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED */
+
+//#if 0
+#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+    mbedtls_ssl_conf_client_certificate_types(&conf, cert_types);
+    mbedtls_ssl_conf_server_certificate_types(&conf, cert_types);
+#endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */
 
 #if defined(MBEDTLS_ECP_C)
     if( opt.curves != NULL )

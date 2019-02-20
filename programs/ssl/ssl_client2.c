@@ -383,6 +383,8 @@ struct options
     int etm;                    /* negotiate encrypt then mac?              */
 } opt;
 
+int cert_types[] = {MBEDTLS_TLS_CERT_TYPE_RAW_PUBLIC_KEY, MBEDTLS_TLS_CERT_TYPE_X509, MBEDTLS_TLS_CERT_TYPE_NONE};
+
 static void my_debug( void *ctx, int level,
                       const char *file, int line,
                       const char *str )
@@ -1472,8 +1474,8 @@ int main( int argc, char *argv[] )
     }
 #endif
 
-#if 0
-//#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+//#if 0
+#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
     mbedtls_ssl_conf_client_certificate_types(&conf, cert_types);
     mbedtls_ssl_conf_server_certificate_types(&conf, cert_types);
 #endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */
