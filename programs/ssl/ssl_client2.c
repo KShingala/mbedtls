@@ -1472,6 +1472,12 @@ int main( int argc, char *argv[] )
     }
 #endif
 
+#if 0
+//#ifdef MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT
+    mbedtls_ssl_conf_client_certificate_types(&conf, cert_types);
+    mbedtls_ssl_conf_server_certificate_types(&conf, cert_types);
+#endif /* MBEDTLS_SSL_RAW_PUBLIC_KEY_SUPPORT */
+
 #if defined(MBEDTLS_ECP_C)
     if( opt.curves != NULL &&
         strcmp( opt.curves, "default" ) != 0 )
