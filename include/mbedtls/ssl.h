@@ -870,6 +870,7 @@ struct mbedtls_ssl_config
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     /** Callback to customize X.509 certificate chain verification          */
     int (*f_vrfy)(void *, mbedtls_x509_crt *, int, uint32_t *);
+    int (*f_vrfy_raw)(void *, const unsigned char *, int, int, uint32_t *);
     void *p_vrfy;                   /*!< context for X.509 verify calllback */
 #endif
 
@@ -1345,6 +1346,10 @@ void mbedtls_ssl_conf_authmode( mbedtls_ssl_config *conf, int authmode );
 void mbedtls_ssl_conf_verify( mbedtls_ssl_config *conf,
                      int (*f_vrfy)(void *, mbedtls_x509_crt *, int, uint32_t *),
                      void *p_vrfy );
+
+void mbedtls_ssl_conf_raw_verify(mbedtls_ssl_config *conf,
+	                 int (*f_vrfy_raw)(void *, const unsigned char *, int, int, uint32_t *),
+	                 void * p_vrfy);
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
 
 /**

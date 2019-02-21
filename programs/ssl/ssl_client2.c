@@ -449,6 +449,12 @@ static int my_verify( void *data, mbedtls_x509_crt *crt,
     char buf[1024];
     ((void) data);
 
+    if (depth == -1)
+    {
+        mbedtls_printf( "\nVerify Raw Public Key!\n");
+        return( 0 );
+    }
+
     mbedtls_printf( "\nVerify requested for (Depth %d):\n", depth );
     mbedtls_x509_crt_info( buf, sizeof( buf ) - 1, "", crt );
     mbedtls_printf( "%s", buf );
@@ -462,6 +468,105 @@ static int my_verify( void *data, mbedtls_x509_crt *crt,
     }
 
     return( 0 );
+}
+
+void buffer_print(const unsigned char * buf, uint32_t buflen)
+{
+    char print_buffer[81];
+    uint32_t line_length = 0;
+    uint32_t remaining_print_buffer;
+    uint32_t offset = 0;
+    int printed = 0;
+
+    mbedtls_printf("Print buffer at %p, buffer length %d\n", buf, buflen );
+
+    while ((buf != NULL) && (offset != buflen))
+    {
+        // Print a signle line
+        line_length = 0;
+        remaining_print_buffer = 81;
+        while ((line_length < 80) && (remaining_print_buffer != 0))
+        {
+            //mbedtls_printf("line length %d, offset %d, remaining_print_buffer %d\n", line_length, offset, remaining_print_buffer);
+            printed = snprintf( &print_buffer[line_length], remaining_print_buffer, "%02x", buf[offset] );
+            if (printed == 2)
+            {
+                line_length+= 2;
+                offset++;
+                remaining_print_buffer = 81 - line_length;
+            }
+            if (offset  == buflen)
+            {
+                break;
+            }
+        }
+        mbedtls_printf("\t%s\n", print_buffer);
+    }
+}
+
+
+int digest_and_compare( const unsigned char * data, uint32_t datalen )
+{
+    int ret = 0;
+    unsigned char hash[32];
+
+    const unsigned char expected_digest[32] =
+    {
+        // 0,    1,    2,    3,    4,    5,    6,   7,
+        0x63, 0x21, 0xb5, 0x6f, 0x62, 0x14, 0x01, 0x4b,
+        0xbf, 0xe2, 0xb3, 0x0f, 0x36, 0x68, 0x58, 0x7b,
+        0x17, 0x34, 0xff, 0x6d, 0x9e, 0xd9, 0x84, 0xb9,
+        0x5f, 0x12, 0x27, 0x0a, 0xf4, 0x82, 0xe4, 0x14
+    };
+
+    // Calculate sha256 digest.
+    ret = mbedtls_sha256_ret(data, datalen, hash, 0);
+
+    if (ret == 0)
+    {
+        // Comapre with the expected digest.
+        ret = memcmp(hash, expected_digest, 32);
+        if (ret != 0)
+        {
+            // Did not match!
+            ret = -1;
+        }
+    }
+    else
+    {
+        ret = -2;
+    }
+
+    return ret;
+}
+
+
+int my_verify_raw(void *data, const unsigned char * raw_key, int length, int depth, uint32_t * flags)
+{
+    int ret = 0;
+
+    buffer_print((const unsigned char *) raw_key, length );
+
+    ret = digest_and_compare(raw_key, length);
+
+    if (ret != 0)
+    {
+        mbedtls_printf("Peer's Raw Key could not be verified!\n");
+        if (ret == -1)
+        {
+            *flags = MBEDTLS_X509_BADCERT_SKIP_VERIFY;
+        }
+        else if (ret == -2)
+        {
+            *flags = MBEDTLS_X509_BADCERT_OTHER;
+        }
+    }
+    else
+    {
+        mbedtls_printf("Successfully verified peer's raw key\n");
+    }
+
+    return( ret );
 }
 
 static int ssl_sig_hashes_for_test[] = {
@@ -1372,7 +1477,10 @@ int main( int argc, char *argv[] )
     }
 
     if( opt.debug_level > 0 )
+    {
         mbedtls_ssl_conf_verify( &conf, my_verify, NULL );
+        mbedtls_ssl_conf_raw_verify( &conf, my_verify_raw, NULL );
+    }
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
 
     if( opt.auth_mode != DFL_AUTH_MODE )

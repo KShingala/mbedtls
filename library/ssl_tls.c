@@ -5460,6 +5460,41 @@ write_msg:
     return( ret );
 }
 
+
+/** Send alert based on the verify result. */
+static void ssl_send_alert( mbedtls_ssl_context *ssl )
+{
+    uint8_t alert;
+
+    /* The certificate may have been rejected for several reasons.
+       Pick one and send the corresponding alert. Which alert to send
+       may be a subject of debate in some cases. */
+    if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_OTHER )
+        alert = MBEDTLS_SSL_ALERT_MSG_ACCESS_DENIED;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_CN_MISMATCH )
+        alert = MBEDTLS_SSL_ALERT_MSG_BAD_CERT;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_KEY_USAGE )
+        alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_EXT_KEY_USAGE )
+        alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_NS_CERT_TYPE )
+        alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_BAD_PK )
+        alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_BAD_KEY )
+        alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_EXPIRED )
+        alert = MBEDTLS_SSL_ALERT_MSG_CERT_EXPIRED;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_REVOKED )
+        alert = MBEDTLS_SSL_ALERT_MSG_CERT_REVOKED;
+    else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_NOT_TRUSTED )
+        alert = MBEDTLS_SSL_ALERT_MSG_UNKNOWN_CA;
+    else
+        alert = MBEDTLS_SSL_ALERT_MSG_CERT_UNKNOWN;
+    mbedtls_ssl_send_alert_message( ssl, MBEDTLS_SSL_ALERT_LEVEL_FATAL,
+                                    alert );
+}
+
 /*
  * Once the certificate message is read, parse it into a cert chain and
  * perform basic checks, but leave actual verification to the caller
@@ -5581,6 +5616,15 @@ static int ssl_parse_certificate_chain( mbedtls_ssl_context *ssl )
 
         i += 3;
         mbedtls_pk_parse_public_key( &ssl->session_negotiate->peer_cert->pk, ssl->in_msg + i, n);
+        if (ssl->conf->f_vrfy_raw != NULL)
+        {
+            ret = ssl->conf->f_vrfy_raw(ssl->conf->p_vrfy, ssl->in_msg + i, n, 0, &ssl->session_negotiate->verify_result);
+            if (ret != 0)
+            {
+                ssl_send_alert(ssl);
+                return MBEDTLS_SSL_ALERT_MSG_BAD_CERT;
+            }
+        }
         MBEDTLS_SSL_DEBUG_BUF( 3, "peer raw public key", ssl->in_msg + i, n );
         i += n;
     }
@@ -5869,35 +5913,7 @@ crt_verify:
 
             if( ret != 0 )
             {
-                uint8_t alert;
-
-                /* The certificate may have been rejected for several reasons.
-                   Pick one and send the corresponding alert. Which alert to send
-                   may be a subject of debate in some cases. */
-                if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_OTHER )
-                    alert = MBEDTLS_SSL_ALERT_MSG_ACCESS_DENIED;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_CN_MISMATCH )
-                    alert = MBEDTLS_SSL_ALERT_MSG_BAD_CERT;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_KEY_USAGE )
-                    alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_EXT_KEY_USAGE )
-                    alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_NS_CERT_TYPE )
-                    alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_BAD_PK )
-                    alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_BAD_KEY )
-                    alert = MBEDTLS_SSL_ALERT_MSG_UNSUPPORTED_CERT;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_EXPIRED )
-                    alert = MBEDTLS_SSL_ALERT_MSG_CERT_EXPIRED;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_REVOKED )
-                    alert = MBEDTLS_SSL_ALERT_MSG_CERT_REVOKED;
-                else if( ssl->session_negotiate->verify_result & MBEDTLS_X509_BADCERT_NOT_TRUSTED )
-                    alert = MBEDTLS_SSL_ALERT_MSG_UNKNOWN_CA;
-                else
-                    alert = MBEDTLS_SSL_ALERT_MSG_CERT_UNKNOWN;
-                mbedtls_ssl_send_alert_message( ssl, MBEDTLS_SSL_ALERT_LEVEL_FATAL,
-                                                alert );
+                ssl_send_alert(ssl);
             }
         }
 
@@ -7174,6 +7190,15 @@ void mbedtls_ssl_conf_verify( mbedtls_ssl_config *conf,
     conf->f_vrfy      = f_vrfy;
     conf->p_vrfy      = p_vrfy;
 }
+
+
+void mbedtls_ssl_conf_raw_verify(mbedtls_ssl_config *conf,
+                     int (*f_vrfy_raw)(void *, const unsigned char *, int, int, uint32_t *),
+                     void * p_vrfy)
+{
+    conf->f_vrfy_raw  = f_vrfy_raw;
+}
+
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
 
 void mbedtls_ssl_conf_rng( mbedtls_ssl_config *conf,
