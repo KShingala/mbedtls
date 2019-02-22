@@ -16,6 +16,16 @@ set(targets
     mini_client
 )
 
+set(src_merkle-tree
+    ${CMAKE_CURRENT_SOURCE_DIR}/merkle-tree/src/mt_arr_list.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/merkle-tree/src/mt_crypto.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/merkle-tree/src/mt_impl.c
+)
+
+set(inlcude_merkle-tree
+    ${CMAKE_CURRENT_SOURCE_DIR}/merkle-tree/src
+)
+
 if(USE_PKCS11_HELPER_LIBRARY)
     set(libs ${libs} pkcs11-helper)
 endif(USE_PKCS11_HELPER_LIBRARY)
@@ -34,12 +44,15 @@ add_executable(ssl_client1 ssl_client1.c)
 target_link_libraries(ssl_client1 ${libs})
 
 add_executable(ssl_client2 ssl_client2.c)
+target_sources(ssl_client2 PRIVATE ${src_merkle-tree})
+target_include_directories(ssl_client2 PRIVATE ${inlcude_merkle-tree})
 target_link_libraries(ssl_client2 ${libs})
 
 add_executable(ssl_server ssl_server.c)
 target_link_libraries(ssl_server ${libs})
 
-add_executable(ssl_server2 ssl_server2.c)
+add_executable(ssl_server2 ssl_server2.c ${src_merkle-tree})
+target_include_directories(ssl_client2 PRIVATE ${inlcude_merkle-tree})
 target_link_libraries(ssl_server2 ${libs})
 
 add_executable(ssl_fork_server ssl_fork_server.c)

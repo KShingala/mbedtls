@@ -1,0 +1,8 @@
+make[1]: Entering directory '/home/khalbali/msc/merkle-tree/tests'
+..
+
+
+OK (2 tests)
+
+
+make[1]: Leaving directory '/home/khalbali/msc/merkle-tree/tests'
