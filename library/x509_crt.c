@@ -156,6 +156,12 @@ const mbedtls_x509_crt_profile mbedtls_x509_crt_profile_suiteb =
     0,
 };
 
+static void * mbedtls_x509_calloc(uint32_t size, uint32_t count)
+{
+    mbedtls_printf("mbedtls_x509_calloc: %d\r\n", size * count);
+    return mbedtls_calloc(size, count);
+}
+
 /*
  * Check md_alg against profile
  * Return 0 if md_alg is acceptable for this profile, -1 otherwise
@@ -661,7 +667,7 @@ static int x509_get_subject_alt_name( unsigned char **p,
             if( cur->next != NULL )
                 return( MBEDTLS_ERR_X509_INVALID_EXTENSIONS );
 
-            cur->next = mbedtls_calloc( 1, sizeof( mbedtls_asn1_sequence ) );
+            cur->next = mbedtls_x509_calloc( 1, sizeof( mbedtls_asn1_sequence ) );
 
             if( cur->next == NULL )
                 return( MBEDTLS_ERR_X509_INVALID_EXTENSIONS +
@@ -875,7 +881,7 @@ static int x509_crt_parse_der_core( mbedtls_x509_crt *crt, const unsigned char *
 
     // Create and populate a new buffer for the raw field
     crt->raw.len = crt_end - buf;
-    crt->raw.p = p = mbedtls_calloc( 1, crt->raw.len );
+    crt->raw.p = p = mbedtls_x509_calloc( 1, crt->raw.len );
     if( p == NULL )
         return( MBEDTLS_ERR_X509_ALLOC_FAILED );
 
@@ -1109,7 +1115,7 @@ int mbedtls_x509_crt_parse_der( mbedtls_x509_crt *chain, const unsigned char *bu
      */
     if( crt->version != 0 && crt->next == NULL )
     {
-        crt->next = mbedtls_calloc( 1, sizeof( mbedtls_x509_crt ) );
+        crt->next = mbedtls_x509_calloc( 1, sizeof( mbedtls_x509_crt ) );
 
         if( crt->next == NULL )
             return( MBEDTLS_ERR_X509_ALLOC_FAILED );

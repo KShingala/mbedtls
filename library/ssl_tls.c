@@ -54,6 +54,12 @@
 #include "mbedtls/oid.h"
 #endif
 
+static void * mbedtls_x509_calloc(uint32_t size, uint32_t count)
+{
+    mbedtls_printf("Parse Peer Cert: mbedtls_x509_calloc: %d\r\n", size * count);
+    return mbedtls_calloc(size, count);
+}
+
 static void ssl_reset_in_out_pointers( mbedtls_ssl_context *ssl );
 static uint32_t ssl_get_hs_total_len( mbedtls_ssl_context const *ssl );
 
@@ -5592,7 +5598,7 @@ static int ssl_parse_certificate_chain( mbedtls_ssl_context *ssl )
         mbedtls_free( ssl->session_negotiate->peer_cert );
     }
 
-    if( ( ssl->session_negotiate->peer_cert = mbedtls_calloc( 1,
+    if( ( ssl->session_negotiate->peer_cert = mbedtls_x509_calloc( 1,
                     sizeof( mbedtls_x509_crt ) ) ) == NULL )
     {
         MBEDTLS_SSL_DEBUG_MSG( 1, ( "alloc(%d bytes) failed",

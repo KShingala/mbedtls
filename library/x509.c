@@ -70,6 +70,12 @@
 #define CHECK(code) if( ( ret = code ) != 0 ){ return( ret ); }
 #define CHECK_RANGE(min, max, val) if( val < min || val > max ){ return( ret ); }
 
+static void * mbedtls_x509_calloc(uint32_t size, uint32_t count)
+{
+    mbedtls_printf("mbedtls_x509_calloc: %d\r\n", size * count);
+    return mbedtls_calloc(size, count);
+}
+
 /*
  *  CertificateSerialNumber  ::=  INTEGER
  */
@@ -445,7 +451,7 @@ int mbedtls_x509_get_name( unsigned char **p, const unsigned char *end,
             /* Mark this item as being no the only one in a set */
             cur->next_merged = 1;
 
-            cur->next = mbedtls_calloc( 1, sizeof( mbedtls_x509_name ) );
+            cur->next = mbedtls_x509_calloc( 1, sizeof( mbedtls_x509_name ) );
 
             if( cur->next == NULL )
                 return( MBEDTLS_ERR_X509_ALLOC_FAILED );
@@ -459,7 +465,7 @@ int mbedtls_x509_get_name( unsigned char **p, const unsigned char *end,
         if( *p == end )
             return( 0 );
 
-        cur->next = mbedtls_calloc( 1, sizeof( mbedtls_x509_name ) );
+        cur->next = mbedtls_x509_calloc( 1, sizeof( mbedtls_x509_name ) );
 
         if( cur->next == NULL )
             return( MBEDTLS_ERR_X509_ALLOC_FAILED );
@@ -660,7 +666,7 @@ int mbedtls_x509_get_sig_alg( const mbedtls_x509_buf *sig_oid, const mbedtls_x50
     {
         mbedtls_pk_rsassa_pss_options *pss_opts;
 
-        pss_opts = mbedtls_calloc( 1, sizeof( mbedtls_pk_rsassa_pss_options ) );
+        pss_opts = mbedtls_x509_calloc( 1, sizeof( mbedtls_pk_rsassa_pss_options ) );
         if( pss_opts == NULL )
             return( MBEDTLS_ERR_X509_ALLOC_FAILED );
 

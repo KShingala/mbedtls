@@ -44,7 +44,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define mbedtls_printf printf
-#define mbedtls_calloc    calloc
+#define mbedtls_sha256_calloc    calloc
 #define mbedtls_free       free
 #endif /* MBEDTLS_PLATFORM_C */
 #endif /* MBEDTLS_SELF_TEST */
@@ -77,6 +77,14 @@ do {                                                    \
     (b)[(i) + 3] = (unsigned char) ( (n)       );       \
 } while( 0 )
 #endif
+
+
+static void * mbedtls_sha256_calloc(uint32_t size, uint32_t count)
+{
+    mbedtls_printf("mbedtls_sha256_calloc: %d\r\n", size * count);
+    return mbedtls_calloc(size, count);
+}
+
 
 void mbedtls_sha256_init( mbedtls_sha256_context *ctx )
 {
@@ -508,7 +516,7 @@ int mbedtls_sha256_self_test( int verbose )
     unsigned char sha256sum[32];
     mbedtls_sha256_context ctx;
 
-    buf = mbedtls_calloc( 1024, sizeof(unsigned char) );
+    buf = mbedtls_sha256_calloc( 1024, sizeof(unsigned char) );
     if( NULL == buf )
     {
         if( verbose != 0 )
